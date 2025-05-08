@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class MainManager : MonoBehaviour
 {
@@ -14,19 +15,18 @@ public class MainManager : MonoBehaviour
     public Text ScoreText;
     public Text highScoreWithNameText;
     public GameObject GameOverText;
-    
+
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
-
     
-    // Start is called before the first frame update
     void Start()
-    {
+    {        
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        highScoreWithNameText.text = $"High Score: {gameManager.currentPlayerName} : {gameManager.currentPlayerScore}";
-
+        gameManager.LoadData();
+        highScoreWithNameText.text = $"High Score: {gameManager.jsonPlayerName} : {gameManager.jsonPlayerScore}";
+        //gameManager.jsonPlayerName != string.Empty ? $"High Score: {gameManager.jsonPlayerName} : {gameManager.jsonPlayerScore}" : $"High Score: {gameManager.currentPlayerName} : {gameManager.currentPlayerScore}";
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -78,6 +78,20 @@ public class MainManager : MonoBehaviour
         m_GameOver = true;
         GameOverText.SetActive(true);
 
-        gameManager.currentPlayerScore =  m_Points > gameManager.currentPlayerScore ? m_Points : gameManager.currentPlayerScore;
+        //gameManager.currentPlayerScore =  m_Points > gameManager.currentPlayerScore ? m_Points : gameManager.currentPlayerScore;
+
+        if(m_Points > gameManager.jsonPlayerScore)
+        {
+            gameManager.currentPlayerScore = m_Points;
+            highScoreWithNameText.text =  $"High Score: {gameManager.currentPlayerName} : {m_Points}";
+
+            print("New High Score!");
+            gameManager.SaveScore();
+        }
+        else
+        {
+            print("No new High Score!");
+
+        }
     }
 }
